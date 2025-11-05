@@ -1,7 +1,5 @@
-def circumfrence(radius):
-    pi = 3.14159
-    return 2 * pi * radius
+import math
+x = 10
+y = 56
 
-r = float(input("Enter the radius of the circle(Even if it is a whole numbr you will have to enter like 5.0 and 6.0): "))
-
-print("The circumfrence of the circle is:", circumfrence(r))
+print("the cos of x and y is:", math.cos(x), math.cos(y))
