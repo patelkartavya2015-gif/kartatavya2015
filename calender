@@ -1,0 +1,2 @@
+import calendar
+print("The calendar for 2024 is:", calendar.calendar(2024))
