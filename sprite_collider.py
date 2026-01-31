@@ -1,5 +1,6 @@
 import pygame
 import random
+import os
 
 # Simple demo: 1 player sprite, 7 enemy sprites. When an enemy collides with the player, the enemy is removed.
 # Requires: pip install pygame
@@ -12,6 +13,17 @@ WHITE = (255, 255, 255)
 RED = (200, 40, 40)
 BLUE = (40, 120, 200)
 
+def load_image(name, size=None):
+    """Load an image from the script directory. Return Surface or None on failure."""
+    path = os.path.join(os.path.dirname(__file__), name)
+    try:
+        img = pygame.image.load(path).convert_alpha()
+        if size:
+            img = pygame.transform.smoothscale(img, size)
+        return img
+    except Exception:
+        return None
+
 # Scoring configuration
 POINTS_PER_KILL = 1  # base points awarded per enemy
 USE_ROUND_MULTIPLIER = False  # if True, awarded points = POINTS_PER_KILL * round_num
@@ -19,8 +31,12 @@ USE_ROUND_MULTIPLIER = False  # if True, awarded points = POINTS_PER_KILL * roun
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos):
         super().__init__()
-        self.image = pygame.Surface((50, 50), pygame.SRCALPHA)
-        pygame.draw.rect(self.image, BLUE, (0, 0, 50, 50))
+        img = load_image("player.png", (50, 50))
+        if img:
+            self.image = img
+        else:
+            self.image = pygame.Surface((50, 50), pygame.SRCALPHA)
+            pygame.draw.rect(self.image, BLUE, (0, 0, 50, 50))
         self.rect = self.image.get_rect(center=pos)
         self.speed = 6
 
@@ -36,8 +52,12 @@ class Player(pygame.sprite.Sprite):
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, pos):
         super().__init__()
-        self.image = pygame.Surface((40, 40), pygame.SRCALPHA)
-        pygame.draw.circle(self.image, RED, (20, 20), 20)
+        img = load_image("enemy.png", (40, 40))
+        if img:
+            self.image = img
+        else:
+            self.image = pygame.Surface((40, 40), pygame.SRCALPHA)
+            pygame.draw.circle(self.image, RED, (20, 20), 20)
         self.rect = self.image.get_rect(center=pos)
         self.vx = random.choice([-3, -2, -1, 1, 2, 3])
         self.vy = random.choice([-3, -2, -1, 1, 2, 3])
@@ -89,6 +109,9 @@ def main():
     running = True
     font = pygame.font.SysFont(None, 36)
 
+    # Load background (scaled to screen) if available
+    bg = load_image("background.png", (SCREEN_WIDTH, SCREEN_HEIGHT))
+
     while running:
         dt = clock.tick(FPS)
         for event in pygame.event.get():
@@ -107,8 +130,11 @@ def main():
             points = POINTS_PER_KILL * multiplier
             score += len(collided) * points
 
-        # Draw
-        screen.fill(WHITE)
+        # Draw background and sprites
+        if bg:
+            screen.blit(bg, (0, 0))
+        else:
+            screen.fill(WHITE)
         all_sprites.draw(screen)
 
         # Show remaining enemies, round, score, and points-per-kill
