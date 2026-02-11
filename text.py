@@ -1,36 +1,46 @@
 import tkinter as tk
-from datetime import date
+from tkinter.filedialog import askopenfilename, asksaveasfilename
 
 root = tk.Tk()
-root.geometry("300x200")
-root.title("Date Display")
-root.resizable(True, True)
+root.title("The Python Text Editor By The Python Coders")
+root.geometry("600x500")
+root.rowconfigure(0, minsize=800, weight=1)
+root.columnconfigure(1, minsize=800, weight=1)
+txt_edit = tk.Text(root)
 
-lab1 = tk.Label(root, text="Hey There!", font=("Arial", 16), bg="#0800FF")
+def open_file():
+    """Open a file for edditing"""
+    filepath = askopenfilename(
+        filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")])
+    if not filepath:
+        return
+    txt_edit.delete(1.0, tk.END)
+    with open(filepath, "r") as input_file:
+        text = input_file.read()
+        txt_edit.insert(tk.END, text)
+        input_file.close()
+    root.title(f"The Python Text Editor By The Python Coders - {filepath}")
 
-namelbl = tk.Label(root, text="Please Enter Your Name:", font=("Arial", 12))
+def save_file():
+    """Save the current file as a new file"""
+    filepath = asksaveasfilename(
+        defaultextension="txt",
+        filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")],
+    )
+    if not filepath:
+        return
+    with open(filepath, "w") as output_file:
+        text = txt_edit.get(1.0, tk.END)
+        output_file.write(text)
+        output_file.close()
+    root.title(f"The Python Text Editor By The Python Coders - {filepath}")
 
-name_entry = tk.Entry(root, font=("Arial", 12))
+fr_buttons = tk.Frame(root, relief=tk.RAISED, bd=2)
+btn_open = tk.Button(fr_buttons, text="Open", command=open_file)
+btn_save = tk.Button(fr_buttons, text="Save As...", command=save_file)
 
-textbox = tk.Text(root, font=("Arial", 12), height=5, width=30)
-
-def display():
-    name = name_entry.get()
-    global message
-    message = "Welcome to the application.\nToday's date is:"
-
-    greet = "Hello " + name + "!\n"
-
-    textbox.insert(tk.END, greet)
-    textbox.insert(tk.END, "\n" + message)
-    textbox.insert(tk.END, "\n" + str(date.today()))
-
-btn = tk.Button(root, text="Submit", font=("Arial", 12), bg="DarkBlue", fg ="White", command=lambda: display())
-
-lab1.pack(pady=10)
-namelbl.pack()
-name_entry.pack(pady=5)
-btn.pack(pady=10)
-textbox.pack(pady=10)
-
+btn_open.grid(row=0, column=0, sticky="ew", padx=5, pady=5)
+btn_save.grid(row=1, column=0, sticky="ew", padx=5, pady=5)
+fr_buttons.grid(row=0, column=0, sticky="ns")
+txt_edit.grid(row=0, column=1, sticky="nsew")
 root.mainloop()
